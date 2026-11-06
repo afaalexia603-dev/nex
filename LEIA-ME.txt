@@ -1,0 +1,13 @@
+NEX CÓSMICA — CORREÇÃO DA TELA PRETA
+
+PARA GITHUB PAGES:
+1. Extraia este ZIP.
+2. Envie index.html e nex-cosmica.webp para a RAIZ do repositório, juntos.
+3. Em Settings > Pages, use main / (root).
+4. Aguarde a publicação e abra a página via https://...github.io/...
+
+PARA TESTAR SEM PUBLICAR:
+Abra NEX_COSMICA_CORRIGIDA_ABRIR.html; este arquivo já contém a imagem, sem depender de arquivos externos.
+
+O personagem fica visível mesmo se a animação JavaScript não iniciar.
+A voz depende de permissão de microfone, navegador e HTTPS; a IA generativa ainda não está conectada.

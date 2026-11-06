@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070519"><meta name="description" content="NEX — presença cósmica interativa com materialização em fragmentos e comandos de voz.">
+<title>NEX · Presença Cósmica</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,Segoe UI,sans-serif;--lilac:#d5a9ff;--cyan:#9deaff}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#040311;color:white}button,textarea{font:inherit}button{cursor:pointer}button:focus-visible,textarea:focus-visible{outline:2px solid var(--cyan);outline-offset:4px}
+main{position:relative;display:grid;place-items:center;width:100%;height:100dvh;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 50% 47%,#20134a 0%,#080419 58%,#02020a 100%)}
+main:before{content:'';position:absolute;inset:-30%;pointer-events:none;background:radial-gradient(circle at 50% 50%,#7844e01c,transparent 45%);animation:breath 5s ease-in-out infinite alternate}@keyframes breath{to{opacity:.45;transform:scale(1.08)}}
+.scene{height:100dvh;width:min(100vw,calc(100dvh * .5628));max-width:940px;position:relative;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.scene:after{content:'';pointer-events:none;position:absolute;inset:0;background:linear-gradient(to bottom,#05031538,transparent 18%,transparent 74%,#0503157a 100%);z-index:3}
+.backdrop,.figure{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.backdrop{opacity:.2;filter:blur(14px) saturate(.75);transform:scale(1.035)}
+.figure{opacity:1;filter:brightness(1.12);will-change:transform,filter}
+#fragments{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+.center-glow{position:absolute;left:50%;top:21%;width:27%;aspect-ratio:1;border-radius:100%;transform:translate(-50%,-50%);background:radial-gradient(circle,#fff7ffba 0%,#eeb5ff55 19%,#a24df92a 41%,transparent 70%);mix-blend-mode:screen;filter:blur(9px);z-index:2;pointer-events:none;animation:heart 2.1s ease-in-out infinite;opacity:0}@keyframes heart{50%{transform:translate(-50%,-50%) scale(1.35);opacity:.7}}
+.top{position:absolute;z-index:5;top:max(16px,env(safe-area-inset-top));left:0;right:0;text-align:center;pointer-events:none;text-shadow:0 1px 24px #5f2c9a;transition:opacity .4s}.brand{font-family:Georgia,serif;font-size:clamp(25px,5vw,39px);letter-spacing:.43em;padding-left:.43em;color:#f8e8ff;font-weight:400}.sub{font-size:10px;letter-spacing:.28em;color:#dfc7ffad;margin-top:3px}
+.prompt{position:absolute;z-index:7;bottom:calc(6% + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);padding:10px 18px;white-space:nowrap;font-size:clamp(11px,2vw,13px);border:1px solid #dba9ff52;border-radius:100px;background:#110a2fc7;backdrop-filter:blur(15px);color:#efe2ff;box-shadow:0 0 25px #a04bfa35;transition:opacity .4s,transform .4s}
+.prompt[hidden]{display:none}
+#status{position:absolute;z-index:7;bottom:calc(3.1% + env(safe-area-inset-bottom));left:0;right:0;text-align:center;color:#e8d6ffae;letter-spacing:.12em;font-size:10px;pointer-events:none;min-height:13px}
+.controls{position:absolute;z-index:10;bottom:calc(12px + env(safe-area-inset-bottom));right:max(10px,calc((100vw - min(100vw,100dvh * .5628))/2 + 10px));display:flex;gap:9px;align-items:center}
+.circle{display:grid;place-items:center;width:42px;height:42px;border:1px solid #cba3ff70;background:#1a0b39bd;backdrop-filter:blur(12px);border-radius:50%;color:#fff;box-shadow:0 0 20px #ad69fc38;transition:transform .2s,background .2s}.circle:active{transform:scale(.92);background:#6a32a7}.circle svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#repeat{position:absolute;z-index:10;bottom:calc(12px + env(safe-area-inset-bottom));left:max(10px,calc((100vw - min(100vw,100dvh * .5628))/2 + 10px));opacity:.65}
+.chat{position:absolute;z-index:20;left:50%;bottom:calc(68px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(18px);width:min(calc(100vw - 24px),460px);padding:16px;background:#0c0825ed;border:1px solid #d5a6ff75;box-shadow:0 20px 50px #0008,0 0 36px #9147de46;backdrop-filter:blur(20px);border-radius:20px;opacity:0;visibility:hidden;transition:opacity .2s,transform .2s,visibility .2s}
+.chat.visible{visibility:visible;opacity:1;transform:translateX(-50%) translateY(0)}.chat-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;color:#e9d2ff;font-size:13px;letter-spacing:.15em}.close{background:transparent;border:0;color:#ddd;font-size:23px;line-height:1;padding:0 4px}.messages{max-height:min(31dvh,210px);overflow-y:auto;display:grid;gap:9px;margin-bottom:10px}.bubble{font-size:13px;line-height:1.45;padding:9px 11px;border-radius:12px;background:#21133e;color:#f4ecff;overflow-wrap:anywhere}.bubble.me{background:#36235c;margin-left:15%}.entry{display:flex;gap:8px;align-items:flex-end}.entry textarea{min-height:43px;max-height:95px;resize:vertical;flex:1;border:1px solid #735797;border-radius:12px;padding:11px;background:#100922;color:#fff;font-size:14px}.entry button{height:43px;border:1px solid #9870d8;border-radius:12px;padding:0 13px;background:#4a2383;color:white}
+#toast{position:absolute;z-index:25;top:calc(85px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(85vw,340px);text-align:center;font-size:12px;color:#f5eaff;background:#211340df;border:1px solid #a888d4;border-radius:12px;padding:9px 12px;opacity:0;pointer-events:none;transition:opacity .25s}
+@media(min-width:850px){.scene{box-shadow:0 0 100px #2b146f55}.brand{font-size:35px}.controls{right:calc((100vw - min(100vw,100dvh * .5628))/2 + 18px)}#repeat{left:calc((100vw - min(100vw,100dvh * .5628))/2 + 18px)}}
+@media(prefers-reduced-motion:reduce){.center-glow,main:before{animation:none}}
+
+/* NEX V2: subtle responsive dimensional motion without changing the approved art */
+.scene{cursor:pointer;touch-action:manipulation}
+.top{left:18px;right:auto;top:calc(16px + env(safe-area-inset-top));text-align:left}.brand{font-size:19px;letter-spacing:.26em;padding-left:0}.sub{font-size:8px;letter-spacing:.12em}
+.figure{transform:scale(1.008);transform-origin:50% 45%;transition:transform .5s ease-out;animation:cosmicDrift 8s ease-in-out infinite alternate}@keyframes cosmicDrift{from{transform:scale(1.008) translateY(0)}to{transform:scale(1.018) translateY(-3px)}}
+#veil{position:absolute;inset:0;pointer-events:none;z-index:2;background:radial-gradient(circle at 50% 21%,rgba(246,204,255,.10),transparent 16%),linear-gradient(180deg,transparent 20%,rgba(88,39,170,.04) 75%,transparent)}
+#energy{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;mix-blend-mode:screen}
+#mic.active{background:#7534ae;box-shadow:0 0 28px #d5a4ff,0 0 8px #fff6}
+#scene.listening .figure{filter:brightness(1.21) saturate(1.15) !important}
+#scene.speaking .center-glow{animation-duration:.8s}
+#scene.listening .center-glow{animation-duration:1s;opacity:1!important}
+.prompt{pointer-events:none;bottom:calc(7% + env(safe-area-inset-bottom));background:#0f0828b5}
+.controls{z-index:15}#repeat{z-index:15}
+@media(max-width:480px){.circle{width:40px;height:40px}.prompt{font-size:11px;max-width:85%;overflow:hidden;text-overflow:ellipsis}.top{top:max(24px, env(safe-area-inset-top))}}
+@media(prefers-reduced-motion:reduce){.figure,.center-glow{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<section class="scene" id="scene" aria-label="NEX: presença cósmica. Toque para conversar por voz; botão inferior esquerdo repete a materialização.">
+<img class="backdrop" src="nex-cosmica.webp" alt="" aria-hidden="true">
+<img class="figure" id="figure" src="nex-cosmica.webp" alt="Ser cósmico violeta e azul, formado por fragmentos de energia, com luz no peito" draggable="false">
+<div class="center-glow" id="heart"></div><div id="veil"></div><canvas id="fragments" aria-hidden="true"></canvas><canvas id="energy" aria-hidden="true"></canvas>
+<div class="top" aria-hidden="true"><div class="brand">NEX</div><div class="sub">PRESENÇA CÓSMICA</div></div>
+<div class="prompt" id="prompt">Toque na NEX para conversar</div>
+<div id="status" role="status" aria-live="polite">Inicializando presença...</div>
+</section>
+<button class="circle" id="repeat" aria-label="Repetir materialização" title="Repetir materialização"><svg viewBox="0 0 24 24"><path d="M3 11a9 9 0 1 1 2.7 6.4M3 4v7h7"/></svg></button>
+<div class="controls">
+<button class="circle" id="mic" title="Conversar por voz" aria-label="Conversar por voz"><svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg></button>
+<button class="circle" id="write" title="Escrever" aria-label="Abrir escrita"><svg viewBox="0 0 24 24"><path d="m4 20 5-.8L20 8a2.5 2.5 0 0 0-4-4L5 15zM14 6l4 4"/></svg></button>
+</div>
+<div id="toast" role="status"></div>
+<div class="chat" id="chat" role="dialog" aria-label="Conversar com NEX" aria-modal="false">
+<div class="chat-head"><span>CONVERSAR COM NEX</span><button id="close" class="close" title="Fechar conversa" aria-label="Fechar">×</button></div>
+<div class="messages" id="messages"><div class="bubble">Presença cósmica ativa. Você pode falar com a NEX ou escrever aqui. A IA generativa ainda não foi conectada.</div></div>
+<form class="entry" id="form"><textarea id="message" rows="1" placeholder="Escreva para NEX..." aria-label="Sua mensagem"></textarea><button type="submit">Enviar</button></form>
+</div>
+</main>
+<script>
+(()=>{'use strict';
+const qs=s=>document.querySelector(s), scene=qs('#scene'), fig=qs('#figure'), canvas=qs('#fragments'), ctx=canvas.getContext('2d'), energy=qs('#energy'), ec=energy.getContext('2d');
+const heart=qs('#heart'), status=qs('#status'), prompt=qs('#prompt'), mic=qs('#mic'), toast=qs('#toast'), chat=qs('#chat'), messages=qs('#messages'), message=qs('#message');
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches, img=new Image(), W=471,H=836;
+let started=0, phase='loading', tickId=0, recognition=null, particles=[], shards=[], strength=0, modeTimer, toastTimer, showingChat=false;
+let last=0, lastTap=0, pointerPos={x:.5,y:.42};
+function rand(a,b){return a+Math.random()*(b-a)}
+const clamp=v=>Math.max(0,Math.min(1,v));
+const ease=v=>1-Math.pow(1-clamp(v),3);
+const smooth=v=>{v=clamp(v);return v*v*(3-2*v)};
+function sizeCanvas(c,g){const r=scene.getBoundingClientRect(), d=Math.min(window.devicePixelRatio||1,1.6);c.width=Math.round(r.width*d);c.height=Math.round(r.height*d);let sx=c.width/W,sy=c.height/H,sc=Math.max(sx,sy);g.setTransform(sc,0,0,sc,(c.width-W*sc)/2,(c.height-H*sc)/2)}
+function resize(){sizeCanvas(canvas,ctx);sizeCanvas(energy,ec)}
+window.addEventListener('resize',resize,{passive:true});
+function make(){shards=[];particles=[];for(let i=0;i<210;i++){
+ const y=rand(70,800);let spread=y<190?35:y<420?125:y<540?72:y<720?57:22;
+ const x=235+rand(-spread,spread),dur=rand(1000,2100);
+ shards.push({x,y,w:rand(7,25),h:rand(10,42),delay:rand(0,1200),dur,
+ dx:rand(-290,290),dy:rand(200,610),rot:rand(-5,5),alpha:rand(.52,.93)});
+}
+for(let i=0;i<150;i++)particles.push({x:rand(20,451),y:rand(40,790),v:rand(4,22),r:rand(.4,1.6),p:rand(0,7),c:i%4});
+}
+function init(){resize();make();startMaterialize();requestAnimationFrame(draw)}
+img.onload=init;img.onerror=()=>{fig.style.opacity='1';status.textContent='Imagem indisponível. Reabra a página ou use o pacote completo.';prompt.hidden=false;};img.src='nex-cosmica.webp';
+function startMaterialize(){started=performance.now();phase=reduced?'ready':'forming';fig.style.opacity='1';heart.style.opacity=reduced?'.7':'0';status.textContent=reduced?'NEX presente':'Materializando presença...';prompt.hidden=true;scene.classList.remove('listening','speaking');if(reduced){prompt.hidden=false;prompt.textContent='Toque na NEX para conversar'}}
+function showToast(t){toast.textContent=t;toast.style.opacity='1';clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.style.opacity='0',3200)}
+function draw(now){tickId=requestAnimationFrame(draw);if(!img.complete||!img.naturalWidth)return;
+ const seconds=now/1000, elapsed=now-started, ready=phase!=='forming';
+ ctx.clearRect(0,0,W,H);ec.clearRect(0,0,W,H);
+ if(phase==='forming'){
+  const p=clamp((elapsed-200)/2900), topReveal=smooth(clamp((elapsed-300)/2300));
+  fig.style.opacity='1';
+  for(const sh of shards){const t=(elapsed-sh.delay)/sh.dur;if(t<=0||t>=1)continue;const a=ease(t), x=sh.x+sh.dx*(1-a),y=sh.y+sh.dy*(1-a),r=sh.rot*(1-a);ctx.save();ctx.globalAlpha=sh.alpha*Math.sin(Math.PI*clamp(t))*.85;ctx.translate(x,y);ctx.rotate(r);
+   ctx.beginPath();ctx.moveTo(-sh.w*.6,-sh.h*.8);ctx.lineTo(sh.w*.8,-sh.h*.3);ctx.lineTo(sh.w*.1,sh.h*.8);ctx.closePath();ctx.clip();ctx.drawImage(img,-sh.x,-sh.y,W,H);ctx.restore();
+   ec.save();ec.globalAlpha=.18*(1-a);ec.fillStyle='#f2cbff';ec.shadowBlur=10;ec.shadowColor='#d680ff';ec.beginPath();ec.arc(x,y,2.3,0,7);ec.fill();ec.restore();
+  }
+  heart.style.opacity=String(.72*smooth(clamp((p-.52)/.48)));
+  if(p>=1){phase='ready';fig.style.opacity='1';heart.style.opacity='.7';prompt.hidden=false;prompt.textContent='Toque na NEX para conversar';status.textContent='NEX presente'}
+ }
+ const pulse=phase==='listening'?1.6:phase==='speaking'?1.9:1;
+ const breath=.52+.48*Math.sin(seconds*2.2), centerX=237,centerY=183;
+ strength+=(pulse-strength)*.05;
+ // Pulsing light around the approved chest core, without changing the art.
+ let g=ec.createRadialGradient(centerX,centerY,2,centerX,centerY,56+breath*19);
+ g.addColorStop(0,`rgba(255,241,255,${.16+.19*breath*pulse/2})`);g.addColorStop(.28,`rgba(226,117,255,${.08+.14*breath*pulse/2})`);g.addColorStop(1,'rgba(160,76,255,0)');
+ ec.fillStyle=g;ec.beginPath();ec.arc(centerX,centerY,78,0,7);ec.fill();
+ if(phase!=='forming' || elapsed>650){
+  for(const s of particles){let y=(s.y-seconds*s.v%H+H)%H;
+   let a=(.17+.36*(.5+.5*Math.sin(seconds*2.5+s.p)))*(phase==='listening'?1.45:1);
+   ec.globalAlpha=Math.min(.75,a);ec.fillStyle=['#b9eaff','#ffe0fb','#d7b9ff','#ffd5f7'][s.c];ec.beginPath();ec.arc(s.x,y,s.r,0,7);ec.fill();
+  }ec.globalAlpha=1;
+  // Energy filaments that visibly travel outward from the chest, not a still glow.
+  for(let i=0;i<18;i++){let theta=(i/18)*Math.PI*2+.12*Math.sin(seconds*.25+i),len=62+34*Math.sin(i*2.1),r0=24;
+   let x0=centerX+Math.cos(theta)*r0,y0=centerY+Math.sin(theta)*r0;
+   let x1=centerX+Math.cos(theta)*len,y1=centerY+Math.sin(theta)*len;
+   ec.lineWidth=i%3===0?1.1:.65;ec.strokeStyle=i%3===0?'rgba(255,184,241,.22)':'rgba(135,215,255,.17)';
+   ec.beginPath();ec.moveTo(x0,y0);ec.quadraticCurveTo(centerX+(x1-centerX)*.6-8*Math.sin(seconds+i),centerY+(y1-centerY)*.55+9*Math.cos(seconds+i),x1,y1);ec.stroke();
+   const progress=(seconds*.38+i*.23)%1,x=x0+(x1-x0)*progress,y=y0+(y1-y0)*progress;
+   ec.fillStyle=i%3===0?'#ffd9f5':'#b7ecff';ec.globalAlpha=.45+.2*breath;ec.beginPath();ec.arc(x,y,1.3+(pulse-1)*.6,0,7);ec.fill();ec.globalAlpha=1;
+  }
+ }
+}
+function speaking(on){scene.classList.toggle('speaking',on);if(on){phase='speaking';status.textContent='NEX respondendo'}else if(phase==='speaking'){phase='ready';status.textContent='NEX presente'}}
+function bubble(t,me=false){const b=document.createElement('div');b.className='bubble'+(me?' me':'');b.textContent=t;messages.appendChild(b);messages.scrollTop=messages.scrollHeight}
+function speak(text){if(!('speechSynthesis'in window))return;speaking(true);try{speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(text);u.lang='pt-BR';u.rate=.96;u.onend=()=>speaking(false);u.onerror=()=>speaking(false);speechSynthesis.speak(u)}catch{speaking(false)}}
+function respond(t,spoken){bubble(t);showToast(t);if(spoken)speak(t)}
+function process(text,spoken){text=text.trim();if(!text)return;bubble(text,true);const q=text.toLocaleLowerCase('pt-BR');if(/materializ|fragment|repet|recome/.test(q)){startMaterialize();respond('Iniciando materialização.',spoken)}else if(/\bhoras?\b|que horas/.test(q)){respond('Agora são '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'.',spoken)}else if(/pesquis|procur|busc/.test(q)){const terms=text.replace(/^(nex[, ]*)?(pesquise|pesquisar|procure|procurar|busque|buscar|pesquisa)\s*(sobre)?\s*/i,'').trim();if(terms){respond('Abrindo a pesquisa sobre '+terms+'.',spoken);window.open('https://www.google.com/search?q='+encodeURIComponent(terms),'_blank','noopener,noreferrer')}else respond('Qual assunto você quer pesquisar?',spoken)}else if(/ol[aá]|bom dia|boa tarde|boa noite|nex/.test(q)){respond('Estou aqui. Você pode falar comigo, pedir uma pesquisa ou repetir a materialização. Ainda não estou conectada a um modelo generativo.',spoken)}else{respond('Entendi seu comando. A presença visual está funcionando, mas a conversa generativa ainda precisa ser conectada.',spoken)}}
+function openChat(){chat.classList.add('visible');showingChat=true;message.focus()}function closeChat(){chat.classList.remove('visible');showingChat=false;mic.focus()}
+qs('#write').addEventListener('click',()=>showingChat?closeChat():openChat());qs('#close').addEventListener('click',closeChat);
+qs('#form').addEventListener('submit',e=>{e.preventDefault();const t=message.value;message.value='';process(t,false)});
+message.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();qs('#form').requestSubmit()}});
+qs('#repeat').addEventListener('click',e=>{e.stopPropagation();startMaterialize()});
+const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+function toggleListening(){if(recognition){recognition.stop();return}if(!SpeechRecognition){showToast('Reconhecimento de voz indisponível neste navegador. Toque no lápis para escrever.');return}
+ const r=new SpeechRecognition();recognition=r;r.lang='pt-BR';r.interimResults=false;r.continuous=false;phase='listening';scene.classList.add('listening');mic.classList.add('active');status.textContent='NEX ouvindo...';prompt.hidden=true;
+ r.onresult=e=>process(e.results[0][0].transcript,true);
+ r.onerror=e=>{if(e.error!=='no-speech')showToast('Não foi possível ouvir: '+e.error)};
+ r.onend=()=>{recognition=null;scene.classList.remove('listening');mic.classList.remove('active');if(phase==='listening'){phase='ready';status.textContent='NEX presente'}prompt.hidden=false};
+ try{r.start()}catch{recognition=null;scene.classList.remove('listening');mic.classList.remove('active');phase='ready';showToast('Não foi possível ativar o microfone.')}}
+mic.addEventListener('click',toggleListening);
+scene.addEventListener('click',e=>{if(e.target.closest('.chat'))return;if(phase==='forming'){return}toggleListening()});
+// The optional keyboard shortcut never steals focus from typing.
+window.addEventListener('keydown',e=>{if(e.key==='Escape'&&showingChat)closeChat();if(e.key===' '&&!showingChat&&document.activeElement===document.body){e.preventDefault();toggleListening()}});
+})();
+</script>
+</body></html>
